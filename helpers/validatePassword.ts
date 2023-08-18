@@ -1,4 +1,4 @@
-export const validatePassword = async (password: string) => {
+export const validatePassword = async (password: string, c) => {
     const SecureStore = require('expo-secure-store');
     const session = await SecureStore.getItemAsync('scanpay_session');
 

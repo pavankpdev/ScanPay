@@ -3,9 +3,46 @@ import {StyleSheet, View} from "react-native";
 import React from "react";
 import Button from "../../components/Button";
 import TextInput from "../../components/TextInput";
+import {useMutation} from "react-query";
+import {verifyPhrase} from "../../helpers/verifyPhrase";
+import {createNewWallet} from "../../helpers/createNewWallet";
+import {useSecureStorage} from "../../hooks/useSecureStorage";
 
-const Display = () => {
-    const mnemonic = "promote social inch punch rude ahead major symbol hurdle exhaust shine follow"
+const Verify = ({navigation}: {navigation: any}) => {
+    const [mnemonic, setMnemonic] = React.useState('')
+
+    const {setItem, getItem} = useSecureStorage()
+
+    const {
+        isLoading: isVerifyingMnemonic,
+        mutate: verifyMnemonicMutation,
+    } = useMutation({
+        mutationKey: 'verifyMnemonic',
+        mutationFn: async () => verifyPhrase(mnemonic),
+        onSuccess: async () => {
+            const session = await getItem('scanpay_session')
+            const sessionData = JSON.parse(session)
+            const {data} = await createNewWallet(
+                sessionData.seed,
+                "Account 1",
+                sessionData.password,
+                sessionData.email
+            )
+
+            const newSession = {
+                ...sessionData,
+                wallets: [data]
+            }
+
+            await setItem('scanpay_session', JSON.stringify(newSession))
+
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Wallet' }],
+            })
+        }
+    })
+
     return (
         <>
             <View style={styles.container}>
@@ -21,11 +58,15 @@ const Display = () => {
                         numberOfLines={6}
                         placeholder={"Enter the seed phrase"}
                         description={"Please enter the words in the correct order, add space between each word"}
+                        value={mnemonic}
+                        onChangeText={(text) => setMnemonic(text)}
                      />
                 </View>
                 <View  style={styles.sections}>
                     <Button
                         mode="contained"
+                        loading={isVerifyingMnemonic}
+                        onPress={() => verifyMnemonicMutation()}
                     >
                         Verify
                     </Button>
@@ -60,4 +101,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Display;
+export default Verify;

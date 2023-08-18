@@ -1,10 +1,31 @@
 import {Chip, Text} from 'react-native-paper';
 import {StyleSheet, View} from "react-native";
-import React from "react";
+import React, {useEffect} from "react";
 import Button from "../../components/Button";
+import {useSecureStorage} from "../../hooks/useSecureStorage";
+import {useMutation, useQuery} from "react-query";
 
-const Display = () => {
-    const mnemonic = "promote social inch punch rude ahead major symbol hurdle exhaust shine follow"
+const Display = ({navigation}: {navigation: any}) => {
+
+    const {getItem} = useSecureStorage()
+
+    const {data, isFetching} = useQuery({
+        queryFn: async () => {
+            const item = await getItem('scanpay_session')
+            if (item) {
+                return JSON.parse(item)
+            }
+        },
+        queryKey: 'scanpay_session',
+    })
+
+    const redirectToVerifyMnemonic = () => {
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'VerifyMnemonic' }],
+        })
+    }
+
     return (
         <>
             <View style={styles.container}>
@@ -15,7 +36,13 @@ const Display = () => {
                 <View style={styles.sections}>
                     <View style={styles.phrases}>
                         {
-                            mnemonic.split(' ').map((word, index) => {
+                            isFetching && <Text>
+                                Loading...
+                            </Text>
+                        }
+
+                        {
+                            !isFetching && data?.mnemonic.split(' ').map((word: string, index: number) => {
                                 return (
                                     <Chip key={index}>{word}</Chip>
                                 )
@@ -29,6 +56,7 @@ const Display = () => {
                     </Text>
                     <Button
                         mode="contained"
+                        onPress={redirectToVerifyMnemonic}
                     >
                         I've saved it, continue
                     </Button>

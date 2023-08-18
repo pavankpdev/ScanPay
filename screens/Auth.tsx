@@ -9,13 +9,13 @@ import {generateNewSeed} from "../helpers/generateNewSeed";
 import { Snackbar } from 'react-native-paper';
 import {validatePassword} from "../helpers/validatePassword";
 
-const Auth = () => {
+const Auth = ({navigation}: {navigation: any}) => {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [isAlreadyRegistered, setIsAlreadyRegistered] = React.useState(false);
     const [showNotification, setShowNotification] = React.useState(false);
 
-    const {getItem, isSecureStorageEnabled, setItem} = useSecureStorage()
+    const {getItem, isSecureStorageEnabled, setItem, removeItem} = useSecureStorage()
 
     useEffect(() => {
         if (!isSecureStorageEnabled) {
@@ -28,11 +28,10 @@ const Auth = () => {
         })
     }, [getItem]);
 
+
     const {
         mutate: generateNewSeedMutation,
         isLoading: isGeneratingNewSeed,
-        isError: isGeneratingNewSeedError,
-        error: newSeedGenerationError,
     } = useMutation({
         mutationFn: async () => generateNewSeed(password, email),
         mutationKey: 'generateNewSeed',
@@ -43,8 +42,13 @@ const Auth = () => {
                 email,
                 password,
                 seed: data.data.seed,
+                mnemonic: data.data.mnemonic,
             })).then(() => {
                 setShowNotification(true)
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'DisplayMnemonic' }],
+                })
             })
         }
     })
@@ -52,15 +56,23 @@ const Auth = () => {
     const {
         mutate: validatePasswordMutation,
         isLoading: isValidatingPassword,
-        isError: isValidatePasswordError,
-        error: validatePasswordError,
     } = useMutation({
-        mutationFn: async () => validatePassword(password),
+        mutationFn: async () => {
+            const session = await getItem('scanpay_session')
+            const sessionData = JSON.parse(session)
+            if(sessionData?.password !== password) {
+                throw new Error('Invalid password')
+            }
+            return true
+        },
         mutationKey: 'validatePassword',
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
             setPassword('')
             setEmail('')
-            setShowNotification(true)
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Wallet' }],
+            })
         },
     })
 
