@@ -8,6 +8,7 @@ import {useMutation} from "react-query";
 import {generateNewSeed} from "../helpers/generateNewSeed";
 import { Snackbar } from 'react-native-paper';
 import {validatePassword} from "../helpers/validatePassword";
+import { SafeAreaView } from 'react-native';
 
 const Auth = ({navigation}: {navigation: any}) => {
     const [email, setEmail] = React.useState('');
@@ -98,7 +99,7 @@ const Auth = ({navigation}: {navigation: any}) => {
             }}>
             Successfully registered ⭐
         </Snackbar>
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <View  style={styles.sections}>
                 <Text variant="headlineSmall" style={{fontWeight: '700'}} >{getHeadings().headline}</Text>
                 <Text variant="titleSmall"  style={{color: "#475569"}}>{getHeadings().title}</Text>
@@ -138,7 +139,7 @@ const Auth = ({navigation}: {navigation: any}) => {
                     }
                 </Button>
             </View>
-        </View>
+        </SafeAreaView>
     </>
 }
 

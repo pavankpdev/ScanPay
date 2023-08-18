@@ -8,7 +8,6 @@ import MDisplay from "./screens/mnemonic/Display";
 import Wallet from "./screens/Wallet";
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
-
 const queryClient = new QueryClient();
 const Stack = createStackNavigator()
 
