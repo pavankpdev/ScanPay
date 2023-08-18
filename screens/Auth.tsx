@@ -4,13 +4,18 @@ import  TextInput from '../components/TextInput';
 import  Button from '../components/Button';
 import React, {useEffect} from "react";
 import {useSecureStorage} from "../hooks/useSecureStorage";
+import {useMutation} from "react-query";
+import {generateNewSeed} from "../helpers/generateNewSeed";
+import { Snackbar } from 'react-native-paper';
+import {validatePassword} from "../helpers/validatePassword";
 
 const Auth = () => {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [isAlreadyRegistered, setIsAlreadyRegistered] = React.useState(false);
+    const [showNotification, setShowNotification] = React.useState(false);
 
-    const {getItem, isSecureStorageEnabled} = useSecureStorage()
+    const {getItem, isSecureStorageEnabled, setItem} = useSecureStorage()
 
     useEffect(() => {
         if (!isSecureStorageEnabled) {
@@ -22,6 +27,42 @@ const Auth = () => {
             }
         })
     }, [getItem]);
+
+    const {
+        mutate: generateNewSeedMutation,
+        isLoading: isGeneratingNewSeed,
+        isError: isGeneratingNewSeedError,
+        error: newSeedGenerationError,
+    } = useMutation({
+        mutationFn: async () => generateNewSeed(password, email),
+        mutationKey: 'generateNewSeed',
+        onSuccess: (data) => {
+            setPassword('')
+            setEmail('')
+            setItem('scanpay_session', JSON.stringify({
+                email,
+                password,
+                seed: data.data.seed,
+            })).then(() => {
+                setShowNotification(true)
+            })
+        }
+    })
+
+    const {
+        mutate: validatePasswordMutation,
+        isLoading: isValidatingPassword,
+        isError: isValidatePasswordError,
+        error: validatePasswordError,
+    } = useMutation({
+        mutationFn: async () => validatePassword(password),
+        mutationKey: 'validatePassword',
+        onSuccess: (data) => {
+            setPassword('')
+            setEmail('')
+            setShowNotification(true)
+        },
+    })
 
     const getHeadings = () => {
         if (isAlreadyRegistered) {
@@ -37,6 +78,14 @@ const Auth = () => {
     }
 
     return <>
+        <Snackbar
+            visible={showNotification}
+            onDismiss={() => setShowNotification(false)}
+            action={{
+                label: 'Close',
+            }}>
+            Successfully registered ⭐
+        </Snackbar>
         <View style={styles.container}>
             <View  style={styles.sections}>
                 <Text variant="headlineSmall">{getHeadings().headline}</Text>
@@ -49,20 +98,29 @@ const Auth = () => {
                             mode="outlined"
                             label="Email"
                             placeholder="Type something"
+                            returnKeyType="next"
                             autoCapitalize="none"
                             textContentType="emailAddress"
                             keyboardType="email-address"
+                            value={email}
+                            onChangeText={(text) => setEmail(text)}
                         />
                     )
                 }
                 <TextInput
                     mode="outlined"
                     label="Password"
-                    placeholder="Type something"
+                    placeholder="Type password"
+                    returnKeyType="done"
                     secureTextEntry
-
+                    value={password}
+                    onChangeText={(text) => setPassword(text)}
                 />
-                <Button mode="contained">
+                <Button
+                    mode="contained"
+                    loading={isGeneratingNewSeed || isValidatingPassword}
+                    onPress={ isAlreadyRegistered ? () => validatePasswordMutation() : () => generateNewSeedMutation()}
+                >
                     {
                         isAlreadyRegistered ? 'Login' : 'Register'
                     }

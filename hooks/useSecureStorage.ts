@@ -1,6 +1,6 @@
 export const useSecureStorage = () => {
     const SecureStore = require('expo-secure-store');
-    async function setItem(key: string, value: any) {
+    async function setItem(key: string, value: string) {
         return SecureStore.setItemAsync(key, value);
     }
 

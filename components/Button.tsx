@@ -3,7 +3,12 @@ import { StyleSheet } from 'react-native'
 import { Button as PaperButton } from 'react-native-paper'
 import { theme } from '../core/theme'
 
-type Props = React.ComponentProps<typeof PaperButton> & { mode: string, style?: any }
+type OtherOptions = {
+    mode: string,
+    style?: any,
+}
+
+type Props = React.ComponentProps<typeof PaperButton> & OtherOptions
 
 export default function Button({ mode, style, ...props }: Props) {
     return (
