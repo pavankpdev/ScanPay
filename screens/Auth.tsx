@@ -88,8 +88,8 @@ const Auth = () => {
         </Snackbar>
         <View style={styles.container}>
             <View  style={styles.sections}>
-                <Text variant="headlineSmall">{getHeadings().headline}</Text>
-                <Text variant="titleSmall">{getHeadings().title}</Text>
+                <Text variant="headlineSmall" style={{fontWeight: '700'}} >{getHeadings().headline}</Text>
+                <Text variant="titleSmall"  style={{color: "#475569"}}>{getHeadings().title}</Text>
             </View>
             <View style={styles.sections}>
                 {
