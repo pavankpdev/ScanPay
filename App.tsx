@@ -8,6 +8,8 @@ import MDisplay from "./screens/mnemonic/Display";
 import Wallet from "./screens/Wallet";
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
+import {NetworkProvider} from "./context/network";
+import {AccountProvider} from "./context/account";
 
 
 const queryClient = new QueryClient();
@@ -17,19 +19,23 @@ export default function App() {
   return (
       <QueryClientProvider client={queryClient}>
           <PaperProvider>
-              <NavigationContainer>
-                  <Stack.Navigator
-                      initialRouteName="Auth"
-                      screenOptions={{
-                          headerShown: false,
-                      }}
-                  >
-                      <Stack.Screen name="Auth" component={Auth} />
-                      <Stack.Screen name="DisplayMnemonic" component={MDisplay} />
-                      <Stack.Screen name="VerifyMnemonic" component={MVerify} />
-                      <Stack.Screen name="Wallet" component={Wallet} />
-                  </Stack.Navigator>
-              </NavigationContainer>
+              <NetworkProvider>
+                  <AccountProvider>
+                      <NavigationContainer>
+                          <Stack.Navigator
+                              initialRouteName="Auth"
+                              screenOptions={{
+                                  headerShown: false,
+                              }}
+                          >
+                              <Stack.Screen name="Auth" component={Auth} />
+                              <Stack.Screen name="DisplayMnemonic" component={MDisplay} />
+                              <Stack.Screen name="VerifyMnemonic" component={MVerify} />
+                              <Stack.Screen name="Wallet" component={Wallet} />
+                          </Stack.Navigator>
+                      </NavigationContainer>
+                  </AccountProvider>
+              </NetworkProvider>
           </PaperProvider>
       </QueryClientProvider>
   );
