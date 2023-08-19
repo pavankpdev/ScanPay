@@ -9,9 +9,11 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@ethersproject/shims": "^5.7.0",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/stack": "^6.3.17",
     "axios": "^1.4.0",
+    "ethers": "5",
     "expo": "~49.0.7",
     "expo-secure-store": "^12.3.1",
     "expo-status-bar": "~1.6.0",
