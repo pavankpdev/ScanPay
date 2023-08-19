@@ -1,23 +1,47 @@
 import React, {useState} from "react";
 import {ChainOptions, createProvider, defaultChain} from "../utils/provider";
+import {useQuery} from "react-query";
+import {useAccount} from "./account";
 
 const Network = React.createContext({
-    getNativeTokenBalance: (address: string) => {},
     network: defaultChain,
-    setNetwork: (network: ChainOptions) => {}
+    setNetwork: (network: ChainOptions) => {},
+    balance: "0" as any,
+    isFetchingBalance: false,
+    isFetchingEstimatedGas: false,
+    estimatedGas: '0' as any
 })
 
 export const NetworkProvider: React.FC<React.PropsWithChildren> = ({children}) => {
 
     const [network, setNetwork] = useState<ChainOptions>(defaultChain);
 
-    const getNativeTokenBalance = async (address: string) => {
-        const provider = createProvider(network);
-        return provider.getBalance(address);
-    }
+    const {wallet} = useAccount()
+
+    const {data: balance, isFetching: isFetchingBalance} = useQuery({
+        queryFn: async () => {
+            const provider = createProvider(network);
+            return provider.getBalance(wallet?.address as string)
+        },
+        enabled: !!wallet?.address && !!network?.chainId,
+        queryKey: ['getNativeTokenBalance', wallet?.address],
+    })
+
+    const {data: estimatedGas, isFetching: isFetchingEstimatedGas} = useQuery({
+        queryFn: async () => {
+            const provider = createProvider(network);
+            return provider.getGasPrice()
+        },
+        enabled:  !!network?.chainId,
+        queryKey: ['estimatedGas', network],
+    })
+
 
     return <Network.Provider value={{
-        getNativeTokenBalance,
+        balance,
+        isFetchingBalance,
+        estimatedGas,
+        isFetchingEstimatedGas,
         network,
         setNetwork
     }}>

@@ -15,12 +15,13 @@ import {useQuery} from "react-query";
 import {BigNumber, ethers} from "ethers";
 import {useAccount} from "../context/account";
 import Activities from "../components/activities";
+import Send from "../components/prompt/Send";
 const Wallet = ({navigation}: {navigation: any}) => {
     const [value, setValue] = React.useState('Activities');
 
     const {getItem} = useSecureStorage()
     const {setWallet, wallet: selectedWallet} = useAccount()
-    const {getNativeTokenBalance, network} = useNetwork()
+    const {balance, isFetchingBalance, network} = useNetwork()
 
     useEffect(() => {
         getItem('scanpay_session').then((value) => {
@@ -48,12 +49,6 @@ const Wallet = ({navigation}: {navigation: any}) => {
             const {wallets} = JSON.parse(session)
             setWallet(wallets[0])
         }
-    })
-
-    const {data: balance, isFetching: isFetchingBalance} = useQuery({
-        queryFn: async () => getNativeTokenBalance(selectedWallet?.address as string),
-        enabled: !!selectedWallet,
-        queryKey: ['getNativeTokenBalance', selectedWallet?.address],
     })
 
     return (
@@ -97,18 +92,20 @@ const Wallet = ({navigation}: {navigation: any}) => {
                     <WalletUtilityBtn
                         icon={'qrcode-scan'}
                         text={'Scan'}
+                        onPress={console.log}
                     />
-                    <WalletUtilityBtn
-                        icon={'arrow-top-right'}
-                        text={'Send'}
+                    <Send
+                        navigation={navigation}
                     />
                     <WalletUtilityBtn
                         icon={'arrow-bottom-left'}
                         text={'Receive'}
+                        onPress={console.log}
                     />
                     <WalletUtilityBtn
                         icon={'key'}
                         text={'Private Key'}
+                        onPress={console.log}
                     />
                 </View>
             </View>

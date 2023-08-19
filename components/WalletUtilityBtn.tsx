@@ -1,12 +1,14 @@
 import {StyleSheet, Text, View} from "react-native";
-import {IconButton} from "react-native-paper";
+import {Button as PaperButton, IconButton} from "react-native-paper";
+import React from "react";
 
 type WalletUtilityBtnProps = {
     icon: string,
     text: string,
+    onPress: () => void,
 }
 
-const WalletUtilityBtn = ({icon, text}: WalletUtilityBtnProps) => {
+const WalletUtilityBtn = ({icon, text, onPress}: WalletUtilityBtnProps) => {
     return <>
         <View
             style={{
@@ -18,7 +20,7 @@ const WalletUtilityBtn = ({icon, text}: WalletUtilityBtnProps) => {
                 icon={icon}
                 iconColor="#fff"
                 size={25}
-                onPress={() => console.log('Pressed')}
+                onPress={onPress}
                 style={{
                     backgroundColor: '#7339ac',
                 }}
