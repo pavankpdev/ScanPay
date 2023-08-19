@@ -6,6 +6,7 @@ import Auth from "./screens/Auth";
 import MVerify from "./screens/mnemonic/Verify";
 import MDisplay from "./screens/mnemonic/Display";
 import Wallet from "./screens/Wallet";
+import Payment from "./screens/Payment";
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import {NetworkProvider} from "./context/network";
@@ -19,8 +20,8 @@ export default function App() {
   return (
       <QueryClientProvider client={queryClient}>
           <PaperProvider>
-              <NetworkProvider>
-                  <AccountProvider>
+              <AccountProvider>
+                <NetworkProvider>
                       <NavigationContainer>
                           <Stack.Navigator
                               initialRouteName="Auth"
@@ -32,10 +33,11 @@ export default function App() {
                               <Stack.Screen name="DisplayMnemonic" component={MDisplay} />
                               <Stack.Screen name="VerifyMnemonic" component={MVerify} />
                               <Stack.Screen name="Wallet" component={Wallet} />
+                              <Stack.Screen name="Payment" component={Payment} />
                           </Stack.Navigator>
                       </NavigationContainer>
-                  </AccountProvider>
-              </NetworkProvider>
+                   </NetworkProvider>
+                </AccountProvider>
           </PaperProvider>
       </QueryClientProvider>
   );

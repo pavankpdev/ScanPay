@@ -24,7 +24,7 @@ export const Activities = () => {
                     from={activity?.from_address}
                     to={activity?.to_address}
                     amount={activity?.value ?
-                        parseFloat(ethers?.utils.formatEther(activity?.value)) : 0}
+                        parseFloat(ethers?.utils.formatEther(activity?.value || "0")) : 0}
                     hash={activity?.hash}
                 />
             })
