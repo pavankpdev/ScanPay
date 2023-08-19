@@ -1,13 +1,16 @@
 import {StyleSheet, View} from "react-native";
-import { Text } from 'react-native-paper';
+import {Button, Text} from 'react-native-paper';
+import { Linking } from 'react-native';
+import {useNetwork} from "../../context/network";
 
 type ActivityProps = {
     from: string,
     to: string,
     amount: number,
+    hash: string,
 }
 
-const Activity = ({from, amount, to}: ActivityProps) => {
+const Activity = ({from, amount, to, hash}: ActivityProps) => {
     return <>
         <View style={styles.container}>
             <View>
@@ -19,7 +22,7 @@ const Activity = ({from, amount, to}: ActivityProps) => {
                 </Text>: {`${to.slice(0,5)}...${to.slice(-3)}`}</Text>
             </View>
             <View>
-                <Text variant="titleLarge" style={{fontWeight: '700'}}>{amount} ETH</Text>
+                <Text variant="titleLarge" style={{fontWeight: '700'}}>{amount.toFixed(2)} ETH</Text>
             </View>
         </View>
     </>

@@ -8,16 +8,18 @@ import Icon from 'react-native-vector-icons/Entypo';
 import FAIcon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
-import {useNetwork} from "../hooks/useNetwork";
+import {useNetwork} from "../context/network";
 
 import WalletUtilityBtn from "../components/WalletUtilityBtn";
 import {useQuery} from "react-query";
 import {BigNumber, ethers} from "ethers";
+import {useAccount} from "../context/account";
+import Activities from "../components/activities";
 const Wallet = ({navigation}: {navigation: any}) => {
-    const [value, setValue] = React.useState('Tokens');
-    const [selectedWallet, setSelectedWallet] = React.useState<{name: string, address: string} | null>(null);
+    const [value, setValue] = React.useState('Activities');
 
     const {getItem} = useSecureStorage()
+    const {setWallet, wallet: selectedWallet} = useAccount()
     const {getNativeTokenBalance, network} = useNetwork()
 
     useEffect(() => {
@@ -44,7 +46,7 @@ const Wallet = ({navigation}: {navigation: any}) => {
             }
 
             const {wallets} = JSON.parse(session)
-            setSelectedWallet(wallets[0])
+            setWallet(wallets[0])
         }
     })
 
@@ -127,6 +129,7 @@ const Wallet = ({navigation}: {navigation: any}) => {
                 />
             </View>
             <View>
+                <Activities />
             </View>
         </SafeAreaView>
     )

@@ -4,14 +4,16 @@ export type ChainOptions = {
     rpc: string,
     chainId: number,
     name: string,
-    token: string
+    token: string,
+    explorer?: string
 }
 
-export const defaultChain = {
+export const defaultChain: ChainOptions = {
     rpc: "https://eth-sepolia.g.alchemy.com/v2/demo",
     chainId: 11155111,
     name: "Sepolia",
-    token: 'ETH'
+    token: 'ETH',
+    explorer: 'https://sepolia.etherscan.io'
 }
 export const createProvider = (chain: ChainOptions = defaultChain ) => {
     return new ethers.providers.JsonRpcProvider(chain.rpc, chain.chainId);
