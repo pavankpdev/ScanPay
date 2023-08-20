@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {ChainOptions, createProvider, defaultChain} from "../utils/provider";
 import {useQuery} from "react-query";
 import {useAccount} from "./account";
+import {BigNumber} from "ethers";
 
 const Network = React.createContext({
     network: defaultChain,
@@ -26,6 +27,8 @@ export const NetworkProvider: React.FC<React.PropsWithChildren> = ({children}) =
         enabled: !!wallet?.address && !!network?.chainId,
         queryKey: ['getNativeTokenBalance', wallet?.address, network?.chainId],
     })
+
+    console.log('balance', BigNumber.from(balance || "0").toString())
 
     const {data: estimatedGas, isFetching: isFetchingEstimatedGas} = useQuery({
         queryFn: async () => {

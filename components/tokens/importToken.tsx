@@ -11,7 +11,6 @@ import {getTokenName} from "../../helpers/getTokenName";
 import {getTokenSymbol} from "../../helpers/getTokenSymbol";
 import {useAccount} from "../../context/account";
 import {StyleSheet, View} from "react-native";
-import Icon from "react-native-vector-icons/Entypo";
 import {getTokenBalance} from "../../helpers/getTokenBalance";
 
 const ImportToken = () => {
