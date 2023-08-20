@@ -16,8 +16,10 @@ import {BigNumber, ethers} from "ethers";
 import {useAccount} from "../context/account";
 import Activities from "../components/activities";
 import Send from "../components/prompt/Send";
+import QRScanner from "../components/prompt/QRScanner";
 const Wallet = ({navigation}: {navigation: any}) => {
     const [value, setValue] = React.useState('Activities');
+    const [isScannerVisible, setIsScannerVisible] = React.useState(false);
 
     const {getItem} = useSecureStorage()
     const {setWallet, wallet: selectedWallet} = useAccount()
@@ -51,84 +53,96 @@ const Wallet = ({navigation}: {navigation: any}) => {
         }
     })
 
+    const handleScannedData = (data: any) => {
+        console.log(data)
+    }
+
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <View style={styles.networkList}>
-                    <Text style={{color: '#fff'}}>{network?.name?.slice(0,3)}</Text>
-                    <Icon name="chevron-down" size={20} color="#fff" />
-                </View>
-                <View style={styles.accountList}>
-                    <Avatar.Text size={24} label={selectedWallet ? (selectedWallet?.name as string)[0] : "UN"}/>
-                    <PaperText variant="titleMedium">{selectedWallet?.name}</PaperText>
-                    <Icon name="chevron-down" size={20} color="#000" />
-                </View>
-            </View>
-            <View style={styles.walletView}>
-                <View style={{
-                    width: '100%',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}>
-                    <Chip
-                        onPress={() => console.log('Pressed')}
-                        style={{
-                            backgroundColor: '#f5eaff',
-                            borderRadius: 50,
-                            padding: 10,
-                            paddingTop: 5,
-                            paddingBottom: 5,
-                        }}
-                    >
-                        <PaperText style={{color: '#7339ac'}} variant="titleMedium" >{`${selectedWallet?.address.slice(0,5)}...${selectedWallet?.address.slice(-3)}`} {" "}</PaperText>
-                        <FAIcon name="copy" size={15} color="#7339ac" />
-                    </Chip>
-                </View>
-                <PaperText variant="displaySmall" style={{fontWeight: '700', color: '#1e1b4b'}}>
-                    {isFetchingBalance ? 'Loading...' : parseFloat(ethers.utils.formatEther(balance || "0")).toFixed(3)} {network?.token}
-                </PaperText>
-                <View style={styles.utilityIcons}>
-                    <WalletUtilityBtn
-                        icon={'qrcode-scan'}
-                        text={'Scan'}
-                        onPress={console.log}
-                    />
-                    <Send
-                        navigation={navigation}
-                    />
-                    <WalletUtilityBtn
-                        icon={'arrow-bottom-left'}
-                        text={'Receive'}
-                        onPress={console.log}
-                    />
-                    <WalletUtilityBtn
-                        icon={'key'}
-                        text={'Private Key'}
-                        onPress={console.log}
-                    />
-                </View>
-            </View>
-            <View>
-                <SegmentedButtons
-                    value={value}
-                    onValueChange={setValue}
-                    buttons={[
-                        {
-                            value: 'Tokens',
-                            label: 'Tokens',
-                        },
-                        {
-                            value: 'Activities',
-                            label: 'Activities',
-                        }
-                    ]}
+        <>
+
+            <SafeAreaView style={styles.container}>
+                <QRScanner
+                    showScanner={isScannerVisible}
+                    callBack={handleScannedData}
+                    setShowScanner={setIsScannerVisible}
                 />
-            </View>
-            <View>
-                <Activities />
-            </View>
-        </SafeAreaView>
+                <View style={styles.header}>
+                    <View style={styles.networkList}>
+                        <Text style={{color: '#fff'}}>{network?.name?.slice(0,3)}</Text>
+                        <Icon name="chevron-down" size={20} color="#fff" />
+                    </View>
+                    <View style={styles.accountList}>
+                        <Avatar.Text size={24} label={selectedWallet ? (selectedWallet?.name as string)[0] : "UN"}/>
+                        <PaperText variant="titleMedium">{selectedWallet?.name}</PaperText>
+                        <Icon name="chevron-down" size={20} color="#000" />
+                    </View>
+                </View>
+                <View style={styles.walletView}>
+                    <View style={{
+                        width: '100%',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}>
+                        <Chip
+                            onPress={() => console.log('Pressed')}
+                            style={{
+                                backgroundColor: '#f5eaff',
+                                borderRadius: 50,
+                                padding: 10,
+                                paddingTop: 5,
+                                paddingBottom: 5,
+                            }}
+                        >
+                            <PaperText style={{color: '#7339ac'}} variant="titleMedium" >{`${selectedWallet?.address.slice(0,5)}...${selectedWallet?.address.slice(-3)}`} {" "}</PaperText>
+                            <FAIcon name="copy" size={15} color="#7339ac" />
+                        </Chip>
+                    </View>
+                    <PaperText variant="displaySmall" style={{fontWeight: '700', color: '#1e1b4b'}}>
+                        {isFetchingBalance ? 'Loading...' : parseFloat(ethers.utils.formatEther(balance || "0")).toFixed(3)} {network?.token}
+                    </PaperText>
+                    <View style={styles.utilityIcons}>
+                        <WalletUtilityBtn
+                            icon={'qrcode-scan'}
+                            text={'Scan'}
+                            onPress={() => setIsScannerVisible(true)}
+                        />
+                        <Send
+                            navigation={navigation}
+                        />
+                        <WalletUtilityBtn
+                            icon={'arrow-bottom-left'}
+                            text={'Receive'}
+                            onPress={console.log}
+                        />
+                        <WalletUtilityBtn
+                            icon={'key'}
+                            text={'Private Key'}
+                            onPress={console.log}
+                        />
+                    </View>
+                </View>
+                <View>
+                    <SegmentedButtons
+                        value={value}
+                        onValueChange={setValue}
+                        buttons={[
+                            {
+                                value: 'Tokens',
+                                label: 'Tokens',
+                            },
+                            {
+                                value: 'Activities',
+                                label: 'Activities',
+                            }
+                        ]}
+                    />
+                </View>
+                <View>
+                    <Activities />
+                </View>
+            </SafeAreaView>
+        </>
     )
 }
 
@@ -141,6 +155,7 @@ const styles = StyleSheet.create({
         height: '100%',
         flexDirection: 'column',
         gap: 20,
+        flex: 1,
     },
     walletView: {
         width: '100%',
