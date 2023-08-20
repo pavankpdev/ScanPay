@@ -32,11 +32,6 @@ const PrivateKey = () => {
         gap: 10
     };
 
-    const redirectToPayment = () => {
-        if(!password) return
-        hideModal()
-    }
-
     const {
         mutate: validatePasswordMutation,
         isLoading: isValidatingPassword,
@@ -53,7 +48,7 @@ const PrivateKey = () => {
             return sessionData?.wallets?.find((w: {address: string}) => w.address === wallet?.address)?.privateKey
         },
         mutationKey: 'validatePassword',
-        onSuccess: async (data) => {
+        onSuccess: async () => {
             setPassword('')
         },
     })
