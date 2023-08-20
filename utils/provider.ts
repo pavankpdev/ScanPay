@@ -9,7 +9,7 @@ export type ChainOptions = {
 }
 
 export const defaultChain: ChainOptions = {
-    rpc: "https://eth-sepolia.g.alchemy.com/v2/demo",
+    rpc: "https://eth-sepolia.g.alchemy.com/v2/2szX75UdFdHaAe9466h9plA8KiHJueFP",
     chainId: 11155111,
     name: "Sepolia",
     token: 'ETH',

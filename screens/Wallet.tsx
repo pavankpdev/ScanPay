@@ -54,7 +54,13 @@ const Wallet = ({navigation}: {navigation: any}) => {
     })
 
     const handleScannedData = (data: any) => {
-        console.log(data)
+        if(ethers.utils.isAddress(data)) {
+            navigation.navigate('Payment', {
+                address: data
+            })
+            return
+        }
+        alert('Invalid QR Code')
     }
 
     return (

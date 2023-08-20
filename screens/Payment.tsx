@@ -36,26 +36,39 @@ const Payment = ({route, navigation}: {route: any, navigation: any}) => {
     } = useMutation({
         mutationKey: ['initiateTransfer'],
         mutationFn: async () => {
-            const provider = createProvider(network)
-            const session = await getItem('scanpay_session')
+            const provider = createProvider(network);
+            const session = await getItem('scanpay_session');
 
-            const selectedWallet = (JSON.parse(session)).wallets.find((w: {address: string}) => w.address === wallet?.address)
-            console.log({pvt: selectedWallet?.privateKey})
-            const signer = createSigner(selectedWallet?.privateKey as string, network)
+            const selectedWallet = JSON.parse(session).wallets.find((w: any) => w.address === wallet?.address);
+            const signer = createSigner(selectedWallet.privateKey, network);
 
-            const nonce = await provider.getTransactionCount(wallet?.address as string, "latest")
+            const nonce = await provider.getTransactionCount(wallet?.address as string, "latest");
+            const latestBlock = await provider.getBlock("latest");
+            const baseFeePerGas = BigNumber.from(latestBlock.baseFeePerGas || 0);
+
+            const priorityFee = '1000000000';
 
             const tx = {
                 from: wallet?.address,
                 to: route?.params?.address,
                 value: ethers.utils.parseEther(amount),
-                nonce: 2,
-                gasLimit: '100000', // 100000
-                gasPrice: BigNumber.from(estimatedGas).toString(),
+                nonce: nonce + 1,
+                gasLimit: '80000',
+                gasPrice: baseFeePerGas.add(BigNumber.from(priorityFee)), // priorityFee to speed up transaction
+            };
+
+            const txn = await signer.sendTransaction(tx).catch(console.log);
+
+            if (txn?.wait) {
+                await txn.wait().catch(console.log);
             }
 
-            const txn = await signer.sendTransaction(tx).catch(console.log)
-            console.log(txn)
+            if (txn?.hash) {
+                alert(`Transaction initiated. Txn hash: ${txn.hash}`);
+                navigation.navigate('Wallet');
+            } else {
+                alert(`Transaction failed.`);
+            }
         }
     })
 
