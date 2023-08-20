@@ -3698,7 +3698,7 @@ expo-constants@~14.4.2:
     "@expo/config" "~8.1.0"
     uuid "^3.3.2"
 
-expo-file-system@~15.4.0, expo-file-system@~15.4.3:
+expo-file-system@^15.4.3, expo-file-system@~15.4.0, expo-file-system@~15.4.3:
   version "15.4.3"
   resolved "https://registry.yarnpkg.com/expo-file-system/-/expo-file-system-15.4.3.tgz#0cb2464c6e663ad8e8a742d5c538ed8ff1013b11"
   integrity sha512-HaaCBTUATs2+i7T4jxIvoU9rViAHMvOD2eBaJ1H7xPHlwZlMORjQs7bsNKonR/TQoduxZBJLVZGawvaAJNCH8g==
@@ -3746,6 +3746,11 @@ expo-secure-store@^12.3.1:
   version "12.3.1"
   resolved "https://registry.yarnpkg.com/expo-secure-store/-/expo-secure-store-12.3.1.tgz#7e5ba94f6e7374f132108c9feb5cc811568f3db6"
   integrity sha512-XLIgWDiIuiR0c+AA4NCWWibAMHCZUyRcy+lQBU49U6rvG+xmd3YrBJfQjfqAPyLroEqnLPGTWUX57GyRsfDOQw==
+
+expo-sharing@^11.5.0:
+  version "11.5.0"
+  resolved "https://registry.yarnpkg.com/expo-sharing/-/expo-sharing-11.5.0.tgz#a8cad65874d882b7f75b12856b4ef55ea9b60a2d"
+  integrity sha512-uerM5YH1FKDZXfkP9ORebvlMVOPP/AfoYgYBez6a8G9fztNYHnRCA6mgK+3aQmpnb3ltmjnAZC39kH18bTNcVw==
 
 expo-status-bar@~1.6.0:
   version "1.6.0"
@@ -6082,6 +6087,11 @@ react-native-safe-area-context@^4.7.1:
   version "4.7.1"
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-4.7.1.tgz#b7be2d68dee909717cfa439bb5c7966042d231e8"
   integrity sha512-X2pJG2ttmAbiGlItWedvDkZg1T1ikmEDiz+7HsiIwAIm2UbFqlhqn+B1JF53mSxPzdNaDcCQVHRNPvj8oFu6Yg==
+
+react-native-share@^9.2.3:
+  version "9.2.3"
+  resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-9.2.3.tgz#14eb07cb1ee503421df0e9a80fdbf3fb0180223b"
+  integrity sha512-y6ju4HS6ydJoPVoacZ/Hp3i47AfI9W4e76Jv00r01dVbr6SCCcuqk37kIbn+kYivdTxOW77UGEbhtBHHtXnhzg==
 
 react-native-vector-icons@^10.0.0:
   version "10.0.0"
