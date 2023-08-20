@@ -1,4 +1,4 @@
-import { Text } from 'react-native-paper';
+import {Divider, Text} from 'react-native-paper';
 import {StyleSheet, View} from "react-native";
 import  TextInput from '../components/TextInput';
 import  Button from '../components/Button';
@@ -9,8 +9,10 @@ import {generateNewSeed} from "../helpers/generateNewSeed";
 import { Snackbar } from 'react-native-paper';
 import {validatePassword} from "../helpers/validatePassword";
 import { SafeAreaView } from 'react-native';
+import RecoverAccounts from "../components/prompt/RecoverAccounts";
 
 const Auth = ({navigation}: {navigation: any}) => {
+    const [mnemonic, setMnemonic] = React.useState('');
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [isAlreadyRegistered, setIsAlreadyRegistered] = React.useState(false);
@@ -117,6 +119,9 @@ const Auth = ({navigation}: {navigation: any}) => {
                             keyboardType="email-address"
                             value={email}
                             onChangeText={(text) => setEmail(text)}
+                            style={{
+                                marginTop: 10,
+                            }}
                         />
                     )
                 }
@@ -128,6 +133,9 @@ const Auth = ({navigation}: {navigation: any}) => {
                     secureTextEntry
                     value={password}
                     onChangeText={(text) => setPassword(text)}
+                    style={{
+                        marginTop: 10,
+                    }}
                 />
                 <Button
                     mode="contained"
@@ -138,6 +146,29 @@ const Auth = ({navigation}: {navigation: any}) => {
                         isAlreadyRegistered ? 'Login' : 'Register'
                     }
                 </Button>
+            </View>
+            <View
+                style={{
+                    marginTop: 20,
+                    width: '100%',
+                }}
+            >
+                <Divider style={{width: '100%'}} />
+                <View  style={{
+                    ...styles.sections,
+                    marginTop: 20,
+                }}>
+                    <Text variant="headlineSmall" style={{fontWeight: '700'}}>
+                        Import Existing Account
+                    </Text>
+                    <Text variant="titleSmall" style={{color: "#475569"}}>
+                        Recover your account using your the mnemonic phrase you saved
+                    </Text>
+
+                    <RecoverAccounts
+                        navigation={navigation}
+                    />
+                </View>
             </View>
         </SafeAreaView>
     </>
@@ -155,7 +186,6 @@ const styles = StyleSheet.create({
     },
     sections: {
         width: '100%'
-
     },
     input: {
         width: '100%'
