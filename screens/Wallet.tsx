@@ -17,6 +17,7 @@ import {useAccount} from "../context/account";
 import Activities from "../components/activities";
 import Send from "../components/prompt/Send";
 import QRScanner from "../components/prompt/QRScanner";
+import Receive from "../components/prompt/Receive";
 const Wallet = ({navigation}: {navigation: any}) => {
     const [value, setValue] = React.useState('Activities');
     const [isScannerVisible, setIsScannerVisible] = React.useState(false);
@@ -63,6 +64,11 @@ const Wallet = ({navigation}: {navigation: any}) => {
         alert('Invalid QR Code')
     }
 
+    const copyToClipboard = async () => {
+        const Clipboard = require('expo-clipboard');
+        await Clipboard.setStringAsync(selectedWallet?.address as string);
+    };
+
     return (
         <>
 
@@ -91,7 +97,7 @@ const Wallet = ({navigation}: {navigation: any}) => {
                         justifyContent: 'center',
                     }}>
                         <Chip
-                            onPress={() => console.log('Pressed')}
+                            onPress={copyToClipboard}
                             style={{
                                 backgroundColor: '#f5eaff',
                                 borderRadius: 50,
@@ -116,11 +122,7 @@ const Wallet = ({navigation}: {navigation: any}) => {
                         <Send
                             navigation={navigation}
                         />
-                        <WalletUtilityBtn
-                            icon={'arrow-bottom-left'}
-                            text={'Receive'}
-                            onPress={console.log}
-                        />
+                        <Receive />
                         <WalletUtilityBtn
                             icon={'key'}
                             text={'Private Key'}

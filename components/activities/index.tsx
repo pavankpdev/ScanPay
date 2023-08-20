@@ -4,13 +4,15 @@ import {useAccount} from "../../context/account";
 import {useNetwork} from "../../context/network";
 import Activity from "./Activity";
 import {ethers} from "ethers";
+import { Divider } from 'react-native-paper';
+import {View} from "react-native";
 
 export const Activities = () => {
 
     const {wallet} = useAccount()
     const {network} = useNetwork()
 
-    const {data: activities, error, isFetching} = useQuery({
+    const {data: activities} = useQuery({
         queryFn: async () => getActivities(wallet?.address as string, network?.chainId),
         queryKey: ['getActivities', wallet?.address, network?.chainId],
         enabled: !!wallet && !!network
@@ -19,14 +21,20 @@ export const Activities = () => {
     return <>
         {
             activities && activities?.data?.result?.map((activity: any) => {
-                return <Activity
-                    key={activity?.nonce}
-                    from={activity?.from_address}
-                    to={activity?.to_address}
-                    amount={activity?.value ?
-                        parseFloat(ethers?.utils.formatEther(activity?.value || "0")) : 0}
-                    hash={activity?.hash}
-                />
+                return (
+                    <View>
+                        <Activity
+                            key={activity?.nonce}
+                            from={activity?.from_address}
+                            to={activity?.to_address}
+                            amount={activity?.value ?
+                                parseFloat(ethers?.utils.formatEther(activity?.value || "0")) : 0}
+                            hash={activity?.hash}
+                        />
+                        <Divider />
+                    </View>
+
+                )
             })
         }
     </>
