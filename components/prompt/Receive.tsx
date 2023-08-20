@@ -43,7 +43,7 @@ const Receive = () => {
             };
 
             try {
-                const { data: qrCodeData } = await axios.request(config);
+                const { data: qrCodeData } = await axios.request(config as any);
 
                 const qrCodePath = `${FileSystem.cacheDirectory}qrcode.png`;
 

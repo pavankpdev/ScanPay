@@ -26,6 +26,7 @@ const Send = ({navigation}: Props) => {
         borderRadius: 10,
         borderWidth: 1,
         borderColor: '#3730a3',
+        gap: 10
     };
 
     const redirectToPayment = () => {

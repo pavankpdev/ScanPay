@@ -18,6 +18,7 @@ import Activities from "../components/activities";
 import Send from "../components/prompt/Send";
 import QRScanner from "../components/prompt/QRScanner";
 import Receive from "../components/prompt/Receive";
+import PrivateKey from "../components/prompt/PrivateKey";
 const Wallet = ({navigation}: {navigation: any}) => {
     const [value, setValue] = React.useState('Activities');
     const [isScannerVisible, setIsScannerVisible] = React.useState(false);
@@ -123,11 +124,7 @@ const Wallet = ({navigation}: {navigation: any}) => {
                             navigation={navigation}
                         />
                         <Receive />
-                        <WalletUtilityBtn
-                            icon={'key'}
-                            text={'Private Key'}
-                            onPress={console.log}
-                        />
+                        <PrivateKey  />
                     </View>
                 </View>
                 <View>
