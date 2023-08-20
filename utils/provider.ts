@@ -36,6 +36,20 @@ export const supportedChains: ChainOptions[] = [
         name: "Polygon",
         token: 'MATIC',
         explorer: 'https://polygonscan.com'
+    },
+    {
+        rpc: "https://bsc-dataseed1.binance.org",
+        chainId: 56,
+        name: "Binance",
+        token: 'BNB',
+        explorer: 'https://bscscan.com'
+    },
+    {
+        rpc: "https://data-seed-prebsc-1-s1.binance.org:8545",
+        chainId: 97,
+        name: "Test Binance",
+        token: 'BNB',
+        explorer: 'https://testnet.bscscan.com'
     }
 ]
 
