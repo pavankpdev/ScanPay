@@ -24,7 +24,7 @@ export const NetworkProvider: React.FC<React.PropsWithChildren> = ({children}) =
             return provider.getBalance(wallet?.address as string)
         },
         enabled: !!wallet?.address && !!network?.chainId,
-        queryKey: ['getNativeTokenBalance', wallet?.address],
+        queryKey: ['getNativeTokenBalance', wallet?.address, network?.chainId],
     })
 
     const {data: estimatedGas, isFetching: isFetchingEstimatedGas} = useQuery({
