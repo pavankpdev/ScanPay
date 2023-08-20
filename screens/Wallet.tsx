@@ -20,6 +20,7 @@ import QRScanner from "../components/prompt/QRScanner";
 import Receive from "../components/prompt/Receive";
 import PrivateKey from "../components/prompt/PrivateKey";
 import ChainList from "../components/ChainList";
+import AccountList from "../components/AccountList";
 const Wallet = ({navigation}: {navigation: any}) => {
     const [value, setValue] = React.useState('Activities');
     const [isScannerVisible, setIsScannerVisible] = React.useState(false);
@@ -81,12 +82,7 @@ const Wallet = ({navigation}: {navigation: any}) => {
                 />
                 <View style={styles.header}>
                     <ChainList />
-
-                    <View style={styles.accountList}>
-                        <Avatar.Text size={24} label={selectedWallet ? (selectedWallet?.name as string)[0] : "UN"}/>
-                        <PaperText variant="titleMedium">{selectedWallet?.name}</PaperText>
-                        <Icon name="chevron-down" size={20} color="#000" />
-                    </View>
+                    <AccountList />
                 </View>
                 <View style={styles.walletView}>
                     <View style={{

@@ -1,6 +1,6 @@
 import React from "react";
 
-type Wallet = {name: string, address: string}
+export type Wallet = {name: string, address: string}
 
 const Account = React.createContext({
     wallet: {} as Wallet | null,
