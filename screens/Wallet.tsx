@@ -21,6 +21,8 @@ import Receive from "../components/prompt/Receive";
 import PrivateKey from "../components/prompt/PrivateKey";
 import ChainList from "../components/ChainList";
 import AccountList from "../components/AccountList";
+import ImportToken from "../components/tokens/importToken";
+import Tokens from "../components/tokens";
 const Wallet = ({navigation}: {navigation: any}) => {
     const [value, setValue] = React.useState('Activities');
     const [isScannerVisible, setIsScannerVisible] = React.useState(false);
@@ -138,7 +140,16 @@ const Wallet = ({navigation}: {navigation: any}) => {
                     />
                 </View>
                 <View>
-                    <Activities />
+                    {
+                        value === 'Activities'
+                            ?
+                            <Activities />
+                            :
+                            <View>
+                                <Tokens />
+                                <ImportToken />
+                            </View>
+                    }
                 </View>
             </SafeAreaView>
         </>
