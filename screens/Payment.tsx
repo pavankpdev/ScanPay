@@ -48,7 +48,7 @@ const Payment = ({route, navigation}: {route: any, navigation: any}) => {
         if(parseFloat(amount) > 0) {
 
             if(asset?.isNative) {
-                const isGreaterThanBalance = ethers.utils.parseEther(amount).gt(balance)
+                const isGreaterThanBalance = ethers.utils.parseEther(amount || '0').gt(balance)
                 if(isGreaterThanBalance) {
                     setError('Insufficient balance')
                     return
@@ -57,12 +57,12 @@ const Payment = ({route, navigation}: {route: any, navigation: any}) => {
                 return;
             }
 
-            const isGreaterThanBalance = ethers.utils.parseEther(amount).gt(tokenBalance)
+            const isGreaterThanBalance = ethers.utils.parseEther(amount || "0").gt(tokenBalance || "0")
             if(isGreaterThanBalance) {
                 setError('Insufficient balance')
                 return
             }
-            const isGreaterThanEstimatedGas = ethers.utils.parseEther(estimatedGas).gt(balance)
+            const isGreaterThanEstimatedGas = ethers.utils.parseEther(estimatedGas || '0').gt(balance)
             if(isGreaterThanEstimatedGas) {
                 setError(`Insufficient ${network?.token} balance for gas`)
                 return
@@ -81,34 +81,51 @@ const Payment = ({route, navigation}: {route: any, navigation: any}) => {
             const provider = createProvider(network);
             const session = await getItem('scanpay_session');
 
+            // Get the selected wallet from the session
             const selectedWallet = JSON.parse(session).wallets.find((w: any) => w.address === wallet?.address);
             const signer = createSigner(selectedWallet.privateKey, network);
 
+            // Get the current nonce for the sender's address
             const nonce = await provider.getTransactionCount(wallet?.address as string, "latest");
+
+            // Get the latest block to determine the base fee per gas
             const latestBlock = await provider.getBlock("latest");
             const baseFeePerGas = BigNumber.from(latestBlock.baseFeePerGas || 0);
 
-            const priorityFee = '1000000000';
+            // Set the priority fee in Wei
+            const priorityFeeWei = '1000000000'; // 1 Gwei in Wei
 
+            // Construct the transaction object
             const tx = {
                 from: wallet?.address,
                 to: route?.params?.address,
-                value: ethers.utils.parseEther(amount),
-                nonce: nonce + 1,
-                gasLimit: '80000',
-                gasPrice: baseFeePerGas.add(BigNumber.from(priorityFee)), // priorityFee to speed up transaction
+                value: ethers.utils.parseEther(amount || "0.1"), // Convert amount to Wei
+                nonce: nonce, // Use nonce one higher than the current nonce
+                gasLimit: '21000', // Set an appropriate gas limit
+                gasPrice:  baseFeePerGas.add(priorityFeeWei), // Combine base fee and priority fee
             };
 
-            const txn = await signer.sendTransaction(tx).catch(console.log);
+            try {
+                // Send the transaction and get the transaction response
+                const txn = await signer.sendTransaction(tx);
+                console.log(txn)
+                if(txn?.wait) {
+                    // Wait for the transaction to be mined
+                    await txn.wait().catch(console.log);
+                }
 
-            if (txn?.wait) {
-                await txn.wait().catch(console.log);
-            }
-
-            if (txn?.hash) {
-                alert(`Transaction initiated. Txn hash: ${txn.hash}`);
-                navigation.navigate('Wallet');
-            } else {
+                if (txn?.hash) {
+                    // Transaction successfully initiated
+                    alert(`Transaction initiated. Txn hash: ${txn.hash}`);
+                    console.log(txn.hash)
+                    navigation.navigate('Wallet'); // Navigate to the wallet screen
+                } else {
+                    // Transaction failed
+                    alert(`Transaction failed.`);
+                }
+            } catch (error) {
+                // Handle transaction error
+                console.log("Transaction error:", error);
                 alert(`Transaction failed.`);
             }
         }
@@ -135,15 +152,15 @@ const Payment = ({route, navigation}: {route: any, navigation: any}) => {
             const tx = {
                 from: wallet?.address,
                 to: asset?.address,
-                nonce: nonce + 1,
-                gasLimit: '80000',
-                gasPrice: baseFeePerGas.add(BigNumber.from(priorityFee)), // priorityFee to speed up transaction
+                nonce: nonce, // Use nonce one higher than the current nonce
+                gasLimit: '21000', // Set an appropriate gas limit
+                gasPrice:  baseFeePerGas.add(priorityFee), // Combine base fee and priority fee
             };
 
             const txn = await sendERC20Token(
                 asset?.address as string,
                 route?.params?.address,
-                ethers.utils.parseEther(amount).toString(),
+                ethers.utils.parseEther(amount || "0").toString(),
                 signer,
                 tx
             )
@@ -198,7 +215,7 @@ const Payment = ({route, navigation}: {route: any, navigation: any}) => {
                 returnKeyType="next"
                 autoCapitalize="none"
                 value={amount}
-                onChangeText={(text) => setAmount(text)}
+                onChangeText={(text) => text && setAmount(text)}
                 keyboardType='numeric'
                 description={
                 `Bal: ${parseFloat(ethers.utils.formatEther((asset?.isNative ? balance : tokenBalance) || "0")).toFixed(3)} ${asset?.symbol || network?.token}`
@@ -242,7 +259,7 @@ const Payment = ({route, navigation}: {route: any, navigation: any}) => {
                             style={{fontWeight: '600', fontSize: 20}}
                         >
                             {
-                                `${ethers.utils.formatEther(BigNumber.from(ethers?.utils.parseEther(amount || "0")).toString())} ${asset?.symbol}`
+                                `${ethers.utils.formatEther(BigNumber.from(ethers?.utils.parseEther(amount || "0") || '0').toString())} ${asset?.symbol}`
                             }
                         </Text>
                     )
@@ -251,7 +268,7 @@ const Payment = ({route, navigation}: {route: any, navigation: any}) => {
                     style={{fontWeight: '600', fontSize: 20}}
                 >
                     {
-                        ethers.utils.formatEther(BigNumber.from(ethers?.utils.parseEther(asset?.isNative ? amount : "0" || "0")).add(estimatedGas).toString())
+                        ethers.utils.formatEther(BigNumber.from(ethers?.utils.parseEther(asset?.isNative ? amount : "0" || "0") || '0').add(estimatedGas  || '0').toString())
                     } {network?.token}
                 </Text>
             </View>
