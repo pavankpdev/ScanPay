@@ -44,9 +44,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         position: 'absolute', // Position the scanner overlay
         top: 0,
-        left: -150,
-        right: 100,
-        bottom: 10,
+        right: 1010,
+        bottom: 0,
+        left: -250,
         zIndex: 9999,
     },
 });
