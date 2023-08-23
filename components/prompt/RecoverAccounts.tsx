@@ -33,14 +33,6 @@ const RecoverAccounts = ({navigation}: {navigation: any}) => {
             setMnemonic('')
             setEmail('')
             setPassword('')
-            console.log({
-                email,
-                password,
-                seed: data.seed,
-                mnemonic,
-                wallets: data.wallets
-            })
-
             await setItem('scanpay_session', JSON.stringify({
                 email,
                 password,

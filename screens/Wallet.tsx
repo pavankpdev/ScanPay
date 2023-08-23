@@ -1,10 +1,8 @@
 import {useSecureStorage} from "../hooks/useSecureStorage";
 import React, {useEffect} from "react";
-import {View, Text, StyleSheet} from "react-native";
+import {View, StyleSheet} from "react-native";
 import { Text as PaperText } from 'react-native-paper';
-import { Avatar } from 'react-native-paper';
 import { Chip } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/Entypo';
 import FAIcon from 'react-native-vector-icons/Ionicons';
 import { SafeAreaView } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
@@ -12,7 +10,7 @@ import {useNetwork} from "../context/network";
 
 import WalletUtilityBtn from "../components/WalletUtilityBtn";
 import {useQuery} from "react-query";
-import {BigNumber, ethers} from "ethers";
+import {ethers} from "ethers";
 import {useAccount} from "../context/account";
 import Activities from "../components/activities";
 import Send from "../components/prompt/Send";
@@ -21,8 +19,6 @@ import Receive from "../components/prompt/Receive";
 import PrivateKey from "../components/prompt/PrivateKey";
 import ChainList from "../components/ChainList";
 import AccountList from "../components/AccountList";
-import ImportToken from "../components/tokens/importToken";
-import Tokens from "../components/tokens";
 const Wallet = ({navigation}: {navigation: any}) => {
     const [value, setValue] = React.useState('Activities');
     const [isScannerVisible, setIsScannerVisible] = React.useState(false);
@@ -123,33 +119,32 @@ const Wallet = ({navigation}: {navigation: any}) => {
                         <PrivateKey  />
                     </View>
                 </View>
-                <View>
-                    <SegmentedButtons
-                        value={value}
-                        onValueChange={setValue}
-                        buttons={[
-                            {
-                                value: 'Tokens',
-                                label: 'Tokens',
-                            },
-                            {
-                                value: 'Activities',
-                                label: 'Activities',
-                            }
-                        ]}
-                    />
+                <View
+                    style={{
+                        width: '100%',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        display: 'flex',
+                        backgroundColor: '#f5eaff',
+                        borderRadius: 50,
+                        padding: 10,
+                        paddingTop: 5,
+                        paddingBottom: 5,
+                    }}
+                >
+                    <Chip
+                        style={{
+                            backgroundColor: '#f5eaff',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            display: 'flex',
+                        }}
+                    >
+                        Activities
+                    </Chip>
                 </View>
                 <View>
-                    {
-                        value === 'Activities'
-                            ?
-                            <Activities />
-                            :
-                            <View>
-                                <Tokens />
-                                <ImportToken />
-                            </View>
-                    }
+                    <Activities />
                 </View>
             </SafeAreaView>
         </>

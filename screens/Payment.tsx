@@ -1,4 +1,4 @@
-import {SafeAreaView, StyleSheet, View} from "react-native";
+import {SafeAreaView, ScrollView, StatusBar, StyleSheet, View} from "react-native";
 import { Text } from 'react-native-paper';
 import * as React from "react";
 import {BigNumber, ethers} from "ethers";
@@ -10,37 +10,25 @@ import {createProvider, createSigner} from "../utils/provider";
 import {useSecureStorage} from "../hooks/useSecureStorage";
 import {useMutation, useQuery} from "react-query";
 import {useEffect} from "react";
-import TokenSelect from "../components/tokens/TokenSelect";
-import {getTokenBalance} from "../helpers/getTokenBalance";
-import {sendERC20Token} from "../helpers/sendERC20Token";
 
 const Payment = ({route, navigation}: {route: any, navigation: any}) => {
     const [amount, setAmount] = React.useState('0');
     const [error, setError] = React.useState('');
+    const {balance, estimatedGas, network} = useNetwork()
+
     const [asset, setAsset] = React.useState<{
         name: string,
         symbol: string,
         address?: string,
         isNative?: boolean,
-    } | null>(null);
+    } | null>({
+        name: network.name,
+        symbol: network.token,
+        isNative: true
+    });
 
-    const {balance, estimatedGas, network} = useNetwork()
     const {wallet} = useAccount()
     const {getItem} = useSecureStorage()
-
-
-    const {data: tokenBalance} = useQuery({
-        queryFn: async () => {
-            const session = await getItem('scanpay_session');
-
-            const selectedWallet = JSON.parse(session).wallets.find((w: any) => w.address === wallet?.address);
-            const signer = createSigner(selectedWallet.privateKey, network);
-            return getTokenBalance(asset?.address as string, signer)
-        },
-        queryKey: ['tokenBalance', asset?.address],
-        enabled: Boolean(asset?.address)
-    })
-
 
     useEffect(() => {
         setError('')
@@ -57,11 +45,7 @@ const Payment = ({route, navigation}: {route: any, navigation: any}) => {
                 return;
             }
 
-            const isGreaterThanBalance = ethers.utils.parseEther(amount || "0").gt(tokenBalance || "0")
-            if(isGreaterThanBalance) {
-                setError('Insufficient balance')
-                return
-            }
+
             const isGreaterThanEstimatedGas = ethers.utils.parseEther(estimatedGas || '0').gt(balance)
             if(isGreaterThanEstimatedGas) {
                 setError(`Insufficient ${network?.token} balance for gas`)
@@ -131,53 +115,6 @@ const Payment = ({route, navigation}: {route: any, navigation: any}) => {
         }
     })
 
-    const {
-        mutate: initiateERC20Transfer,
-        isLoading: isERC20TransferLoading
-    } = useMutation({
-        mutationKey: ['initiateERC20Transfer'],
-        mutationFn: async () => {
-            const provider = createProvider(network);
-            const session = await getItem('scanpay_session');
-
-            const selectedWallet = JSON.parse(session).wallets.find((w: any) => w.address === wallet?.address);
-            const signer = createSigner(selectedWallet.privateKey, network);
-
-            const nonce = await provider.getTransactionCount(wallet?.address as string, "latest");
-            const latestBlock = await provider.getBlock("latest");
-            const baseFeePerGas = BigNumber.from(latestBlock.baseFeePerGas || 0);
-
-            const priorityFee = '1000000000';
-
-            const tx = {
-                from: wallet?.address,
-                to: asset?.address,
-                nonce: nonce, // Use nonce one higher than the current nonce
-                gasLimit: '21000', // Set an appropriate gas limit
-                gasPrice:  baseFeePerGas.add(priorityFee), // Combine base fee and priority fee
-            };
-
-            const txn = await sendERC20Token(
-                asset?.address as string,
-                route?.params?.address,
-                ethers.utils.parseEther(amount || "0").toString(),
-                signer,
-                tx
-            )
-
-            if (txn?.wait) {
-                await txn.wait().catch(console.log);
-            }
-
-            if (txn?.hash) {
-                alert(`Transaction initiated. Txn hash: ${txn.hash}`);
-                navigation.navigate('Wallet');
-            } else {
-                alert(`Transaction failed.`);
-            }
-        }
-    })
-
     const cancelTxn = () => {
         navigation.navigate('Wallet')
     }
@@ -188,122 +125,130 @@ const Payment = ({route, navigation}: {route: any, navigation: any}) => {
 
     return <>
         <SafeAreaView style={styles.container}>
-            <Text variant="headlineMedium" style={{fontWeight: '700'}}>Send Funds</Text>
-            <View style={{
-                padding: 20,
-                paddingTop: 10,
-                paddingBottom: 10,
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: '#f5eaff',
-                borderRadius: 10
-            }}>
-                <Text variant="titleSmall" style={{color: '#7339ac'}}>Sending to</Text>
-                <Text
-                    style={{fontWeight: '600', fontSize: 15}}
-                >
-                    {route?.params?.address}
-                </Text>
-            </View>
-            <TokenSelect
-                handleChange={handleChange}
-            />
-            <TextInput
-                mode="outlined"
-                label="Amount"
-                placeholder="0.10"
-                returnKeyType="next"
-                autoCapitalize="none"
-                value={amount}
-                onChangeText={(text) => text && setAmount(text)}
-                keyboardType='numeric'
-                description={
-                `Bal: ${parseFloat(ethers.utils.formatEther((asset?.isNative ? balance : tokenBalance) || "0")).toFixed(3)} ${asset?.symbol || network?.token}`
-            }
-                error={Boolean(error)}
-                errorText={error}
-            />
-            <View style={{
-                padding: 20,
-                paddingTop: 10,
-                paddingBottom: 10,
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: '#f8fafc',
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: '#cbd5e1'
-            }}>
-                <Text variant="titleSmall" style={{color: '#475569'}}>Estimated Gas</Text>
-                <Text
-                    style={{fontWeight: '600', fontSize: 20}}
-                >
-                    {ethers?.utils?.formatEther(estimatedGas || "0")} {network?.token}
-                </Text>
-            </View>
-            <View style={{
-                padding: 20,
-                paddingTop: 10,
-                paddingBottom: 10,
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: '#f8fafc',
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: '#8d53c6'
-            }}>
-                <Text variant="titleSmall" style={{color: '#7339ac'}}>Grand Total (Amount + Gas)</Text>
-                {
-                    asset && !asset?.isNative && (
-                        <Text
-                            style={{fontWeight: '600', fontSize: 20}}
-                        >
-                            {
-                                `${ethers.utils.formatEther(BigNumber.from(ethers?.utils.parseEther(amount || "0") || '0').toString())} ${asset?.symbol}`
-                            }
-                        </Text>
-                    )
+            <ScrollView style={styles.scrollView}>
+                <Text variant="headlineMedium" style={{fontWeight: '700', marginTop: 10}}>Send Funds</Text>
+                <View style={{
+                    padding: 20,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    backgroundColor: '#f5eaff',
+                    borderRadius: 10,
+                    marginTop: 20
+                }}>
+                    <Text variant="titleSmall" style={{color: '#7339ac', }}>Sending to</Text>
+                    <Text
+                        style={{fontWeight: '600', fontSize: 15}}
+                    >
+                        {route?.params?.address}
+                    </Text>
+                </View>
+                <TextInput
+                    mode="outlined"
+                    label="Amount"
+                    placeholder="0.10"
+                    returnKeyType="next"
+                    autoCapitalize="none"
+                    value={amount}
+                    onChangeText={(text) => text && setAmount(text)}
+                    keyboardType='numeric'
+                    description={
+                    `Bal: ${parseFloat(ethers.utils.formatEther((balance) || "0")).toFixed(3)} ${asset?.symbol || network?.token}`
                 }
-                <Text
-                    style={{fontWeight: '600', fontSize: 20}}
-                >
-                    {
-                        ethers.utils.formatEther(BigNumber.from(ethers?.utils.parseEther(asset?.isNative ? amount : "0" || "0") || '0').add(estimatedGas  || '0').toString())
-                    } {network?.token}
-                </Text>
-            </View>
-            <View
-                style={{
-                    flexDirection: 'column'
-                }}
-            >
-                <Button
-                    mode={'contained'}
-                    onPress={() => {
-                        if (asset?.isNative) {
-                            initiateTransfer()
-                        } else {
-                            initiateERC20Transfer()
-                        }
+                    error={Boolean(error)}
+                    errorText={error}
+                    style={{
+                        marginTop: 20
                     }}
-                    loading={isLoading || isERC20TransferLoading}
+                />
+                <View style={{
+                    padding: 20,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    backgroundColor: '#f8fafc',
+                    borderRadius: 10,
+                    borderWidth: 1,
+                    borderColor: '#cbd5e1',
+                    marginTop: 20
+
+                }}>
+                    <Text variant="titleSmall" style={{color: '#475569'}}>Estimated Gas</Text>
+                    <Text
+                        style={{fontWeight: '600', fontSize: 20}}
+                    >
+                        {ethers?.utils?.formatEther(estimatedGas || "0")} {network?.token}
+                    </Text>
+                </View>
+                <View style={{
+                    padding: 20,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    backgroundColor: '#f8fafc',
+                    borderRadius: 10,
+                    borderWidth: 1,
+                    borderColor: '#8d53c6',
+                    marginTop: 20
+                }}>
+                    <Text variant="titleSmall" style={{color: '#7339ac'}}>Grand Total (Amount + Gas)</Text>
+                    {
+                        asset && !asset?.isNative && (
+                            <Text
+                                style={{fontWeight: '600', fontSize: 20}}
+                            >
+                                {
+                                    `${ethers.utils.formatEther(BigNumber.from(ethers?.utils.parseEther(amount || "0") || '0').toString())} ${asset?.symbol}`
+                                }
+                            </Text>
+                        )
+                    }
+                    <Text
+                        style={{fontWeight: '600', fontSize: 20}}
+                    >
+                        {
+                            ethers.utils.formatEther(BigNumber.from(ethers?.utils.parseEther(asset?.isNative ? amount : "0" || "0") || '0').add(estimatedGas  || '0').toString())
+                        } {network?.token}
+                    </Text>
+                </View>
+                <View
+                    style={{
+                        flexDirection: 'column'
+                    }}
                 >
-                    Confirm
-                </Button>
-                <Button mode={'outlined'} onPress={cancelTxn}>
-                    Cancel
-                </Button>
-            </View>
+                    <Button
+                        mode={'contained'}
+                        onPress={() => initiateTransfer()}
+                        loading={isLoading}
+                        style={{
+                            marginTop: 20
+                        }}
+                    >
+                        Confirm
+                    </Button>
+                    <Button mode={'outlined'} onPress={cancelTxn}>
+                        Cancel
+                    </Button>
+                </View>
+            </ScrollView>
         </SafeAreaView>
     </>
 }
 const styles = StyleSheet.create({
     container: {
         padding: 20,
-        paddingTop: 70,
+        paddingTop: StatusBar.currentHeight,
         paddingBottom: 50,
         backgroundColor: '#fff',
         height: '100%',
+
+    },
+    scrollView: {
+        height: '100%',
+        display: 'flex',
         flexDirection: 'column',
         gap: 20,
     },
